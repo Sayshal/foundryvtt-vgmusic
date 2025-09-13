@@ -1,0 +1,12 @@
+<form class="flexcol vgmusic-config" autocomplete="off">
+  <div class="flexcol content">
+    {{#each playlists as |section|}}
+      {{> "modules/foundryvtt-vgmusic/templates/playlist-section.hbs" section=section}}
+    {{/each}}
+
+    <div class="help">
+      <i class="fas fa-info"></i>
+      <span>{{localize "VGMusic.ConfigHelp"}}</span>
+    </div>
+  </div>
+</form>

@@ -1,45 +1,26 @@
 {
-  "VGMusic": {
-    "CONTROLS": {
-      "ToggleAreaMusic": {
-        "Name": "Toggle area music"
-      },
-      "ToggleCombatMusic": {
-        "Name": "Toggle combat music"
-      }
-    },
-    "CombatMusic": "Combat Music",
-    "ConfigHelp": "Drag and drop playlists onto this window's playlist sections to assign music.",
-    "InitialTrack": "Initial Track",
-    "Playlist": "Playlist",
-    "Priority": "Priority",
-    "SETTINGS": {
-      "DefaultMusic": {
-        "Hint": "Various options for default music in certain situations",
-        "Label": "Default Music",
-        "Name": "Default Music"
-      },
-      "SilentCombatMusicMode": {
-        "Hint": "What to do if combat is currently focused on an actor without a combat track",
-        "Name": "Silent Combat Music Mode",
-        "Options": {
-          "area": "Play the area music",
-          "generic": "Play a generic combat music (default or scene combat music)",
-          "highestPriority": "Play music of the actor with highest priority",
-          "lastActor": "Play combat music of the last actor with one"
-        }
-      }
-    },
-    "Scene": {
-      "PlaylistSection": {
-        "Area": "Area",
-        "Combat": "Combat"
-      }
-    },
-    "SceneControls": {
-      "SupressAreaMusic": "Supress Area Music",
-      "SupressCombatMusic": "Supress Combat Music"
-    },
-    "SceneMusic": "Scene Music"
-  }
+  "VGMusic.CombatMusic": "Combat Music",
+  "VGMusic.ConfigHelp": "Drag and drop playlists onto sections to assign music.",
+  "VGMusic.ConfigTitle": "Music Configuration",
+  "VGMusic.Controls.SuppressAreaMusic": "Suppress Area Music",
+  "VGMusic.Controls.SuppressCombatMusic": "Suppress Combat Music",
+  "VGMusic.Default": "Default",
+  "VGMusic.InitialTrack": "Initial Track",
+  "VGMusic.Keybindings.ToggleAreaMusic": "Toggle Area Music",
+  "VGMusic.Keybindings.ToggleCombatMusic": "Toggle Combat Music",
+  "VGMusic.None": "None",
+  "VGMusic.PlaylistSection.Area": "Area Music",
+  "VGMusic.PlaylistSection.Combat": "Combat Music",
+  "VGMusic.Priority": "Priority",
+  "VGMusic.Settings.DefaultMusic.Hint": "Configure default music for various situations",
+  "VGMusic.Settings.DefaultMusic.Label": "Configure Default Music",
+  "VGMusic.Settings.DefaultMusic.Name": "Default Music",
+  "VGMusic.Settings.SilentCombatMusicMode.Area": "Play area music",
+  "VGMusic.Settings.SilentCombatMusicMode.Generic": "Play generic combat music",
+  "VGMusic.Settings.SilentCombatMusicMode.HighestPriority": "Play highest priority actor music",
+  "VGMusic.Settings.SilentCombatMusicMode.Hint": "What to do when combat focuses on an actor without combat music",
+  "VGMusic.Settings.SilentCombatMusicMode.LastActor": "Play last actor's music",
+  "VGMusic.Settings.SilentCombatMusicMode.Name": "Silent Combat Music Mode",
+  "VGMusic.Settings.SuppressArea.Name": "Suppress Area Music",
+  "VGMusic.Settings.SuppressCombat.Name": "Suppress Combat Music"
 }

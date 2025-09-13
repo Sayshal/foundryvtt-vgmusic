@@ -2,21 +2,41 @@
   "authors": [
     {
       "name": "Furyspark"
-    }
-  ],
-  "bugs": "",
-  "changelog": "",
-  "dependencies": [
+    },
     {
-      "name": "lib-wrapper",
-      "type": "module"
+      "discord": "Tyler",
+      "name": "Tyler",
+      "url": "https://github.com/Sayshal"
     }
   ],
-  "description": "A playlist addon for FoundryVTT",
+  "bugs": "https://github.com/Sayshal/foundryvtt-vgmusic/issues",
+  "changelog": "https://github.com/Sayshal/foundryvtt-vgmusic/releases",
+  "compatibility": {
+    "maximum": "13.999",
+    "minimum": "13",
+    "verified": "13.348"
+  },
+  "description": "Advanced playlist management for FoundryVTT with area and combat music automation.",
   "download": "",
   "esmodules": [
-    "module/vgmusic.js"
+    "scripts/vgmusic.mjs"
   ],
+  "flags": {
+    "hotReload": {
+      "extensions": [
+        "css",
+        "html",
+        "hbs",
+        "json"
+      ],
+      "paths": [
+        "styles",
+        "lang",
+        "templates"
+      ]
+    }
+  },
+  "id": "foundryvtt-vgmusic",
   "languages": [
     {
       "lang": "en",
@@ -24,16 +44,21 @@
       "path": "lang/en.json"
     }
   ],
-  "library": false,
-  "license": "MIT",
-  "manifest": "",
-  "name": "vgmusic",
-  "readme": "",
-  "socket": false,
+  "license": "https://github.com/Sayshal/foundryvtt-vgmusic?tab=License-1-ov-file",
+  "manifest": "https://github.com/Sayshal/foundryvtt-vgmusic/releases/latest/module.json",
+  "readme": "https://github.com/Sayshal/foundryvtt-vgmusic?tab=readme-ov-file",
+  "relationships": {
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module"
+      }
+    ]
+  },
   "styles": [
     "styles/vgmusic.css"
   ],
   "title": "Video Game Music",
-  "url": "",
+  "url": "https://github.com/Sayshal/foundryvtt-vgmusic",
   "version": ""
 }

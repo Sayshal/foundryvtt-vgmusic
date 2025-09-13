@@ -1,0 +1,103 @@
+/* VGMusic Styles */
+:root {
+  --vgmusic-border-groove: 2px groove #eeede0;
+  --vgmusic-border-dotted: 1px dotted black;
+  --vgmusic-spacing: 8px;
+}
+
+.vgmusic-config {
+  min-width: 480px;
+}
+
+.vgmusic-config .playlist-section {
+  display: flex;
+  flex: 0 0 96px;
+  padding: 2px;
+  border: var(--vgmusic-border-groove);
+  margin-bottom: var(--vgmusic-spacing);
+}
+
+.vgmusic-config .playlist-section > label {
+  flex: 0 0 96px;
+  font-weight: bold;
+  align-self: center;
+}
+
+.vgmusic-config .playlist-box {
+  display: flex;
+  flex: 1 1 212px;
+  flex-flow: row nowrap;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  border-left: var(--vgmusic-border-dotted);
+}
+
+.vgmusic-config .item-content {
+  flex: 1;
+  margin-right: 4px;
+}
+
+.vgmusic-config .playlist-item {
+  flex: 1;
+  display: block;
+  margin-bottom: var(--vgmusic-spacing);
+}
+
+.vgmusic-config .playlist-item > * {
+  margin-right: 4px;
+}
+
+.vgmusic-config .initial-track {
+  margin-right: 4px;
+  flex: 1;
+}
+
+.vgmusic-config .priority {
+  flex: 0 0 80px;
+}
+
+.vgmusic-config .control {
+  flex: 0;
+  align-self: center;
+}
+
+.vgmusic-config .disabled {
+  color: rgb(0 0 0 / 50%);
+  font-style: italic;
+}
+
+.vgmusic-config .help {
+  margin-top: var(--vgmusic-spacing);
+  padding: var(--vgmusic-spacing);
+  background: rgb(0 0 0 / 5%);
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+.vgmusic-config .help i {
+  margin-right: 4px;
+  color: #06c;
+}
+
+/* Form styling */
+.vgmusic-config .form-group.stacked {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.vgmusic-config .form-group.stacked label {
+  margin-bottom: 2px;
+  font-size: 0.8em;
+  color: #666;
+}
+
+.vgmusic-config .flexrow {
+  gap: var(--vgmusic-spacing);
+}
+
+/* Scene config button */
+.scene-config button[data-action='vgmusic-scene'] {
+  margin-left: var(--vgmusic-spacing);
+}

@@ -1,0 +1,42 @@
+<div class="form-group playlist-section" data-section="{{section.key}}" data-item-id="{{section.playlist.id}}">
+  <label>{{section.label}}</label>
+  <div class="playlist-box">
+    {{#if section.playlist}}
+      <div class="flexcol item-content">
+        <a class="playlist-item" data-action="openPlaylist">
+          <span class="name">
+            <i class="fas fa-music"></i> {{section.playlist.name}}
+          </span>
+        </a>
+
+        <div class="flexrow">
+          <div class="form-group stacked initial-track">
+            <label>{{localize "VGMusic.InitialTrack"}}</label>
+            <select name="music.{{section.key}}.initialTrack">
+              {{#select section.data.initialTrack}}
+                <option value="">{{localize "VGMusic.Default"}}</option>
+                {{#each section.tracks as |track|}}
+                  <option value="{{track.id}}">{{track.name}}</option>
+                {{/each}}
+              {{/select}}
+            </select>
+          </div>
+
+          {{#if section.allowPriority}}
+            <div class="form-group stacked priority">
+              <label>{{localize "VGMusic.Priority"}}</label>
+              <input type="number" name="music.{{section.key}}.priority" value="{{section.data.priority}}"
+                placeholder="0">
+            </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="control">
+        <a data-action="deletePlaylist"><i class="fas fa-trash"></i></a>
+      </div>
+    {{else}}
+      <span class="disabled">{{localize "VGMusic.None"}}</span>
+    {{/if}}
+  </div>
+</div>
