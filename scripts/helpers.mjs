@@ -69,27 +69,20 @@ export class PlaylistContext {
       const playlistId = document.getFlag(CONST.moduleId, `music.${type}.playlist`);
       const playlist = playlistId ? game.playlists.get(playlistId) : null;
       if (!playlist) return null;
-
       const trackId = document.getFlag(CONST.moduleId, `music.${type}.initialTrack`) || null;
       const priority = document.getFlag(CONST.moduleId, `music.${type}.priority`) ?? 0;
-
       return new this(type, document, playlist, trackId, priority, scopeEntity);
     }
-
     if (document.documentName === 'DefaultMusic') {
       const section = document.data?.vgmusic?.music?.[type];
       if (!section) return null;
-
       const playlistId = section.playlist;
       const playlist = playlistId ? game.playlists.get(playlistId) : null;
       if (!playlist) return null;
-
       const trackId = section.initialTrack || null;
       const priority = section.priority ?? 0;
-
       return new this(type, document, playlist, trackId, priority, scopeEntity);
     }
-
     return null;
   }
 }
@@ -101,21 +94,15 @@ export class FadingTrack {
   constructor(track, fadeDuration = 1000) {
     this.track = track;
     this.fadeDuration = fadeDuration;
-
     setTimeout(() => this.delete(), this.fadeDuration + 10);
   }
-
   delete() {
     const controller = game.vgmusic?.musicController;
     if (!controller) return;
-
     const index = controller.fadingTracks.indexOf(this);
     if (index >= 0) {
       controller.fadingTracks.splice(index, 1);
-
-      if (controller.currentTrack === this.track) {
-        controller.playCurrentTrack();
-      }
+      if (controller.currentTrack === this.track) controller.playCurrentTrack();
     }
   }
 }
