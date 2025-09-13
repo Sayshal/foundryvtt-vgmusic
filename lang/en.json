@@ -1,6 +1,6 @@
 {
   "VGMusic.CombatMusic": "Combat Music",
-  "VGMusic.ConfigHelp": "Drag and drop playlists onto sections to assign music.",
+  "VGMusic.ConfigHelp": "Drag and drop playlists onto sections to assign music. Drag sections to reorder them.",
   "VGMusic.ConfigTitle": "Music Configuration",
   "VGMusic.Controls.SuppressAreaMusic": "Suppress Area Music",
   "VGMusic.Controls.SuppressCombatMusic": "Suppress Combat Music",
@@ -22,5 +22,7 @@
   "VGMusic.Settings.SilentCombatMusicMode.LastActor": "Play last actor's music",
   "VGMusic.Settings.SilentCombatMusicMode.Name": "Silent Combat Music Mode",
   "VGMusic.Settings.SuppressArea.Name": "Suppress Area Music",
-  "VGMusic.Settings.SuppressCombat.Name": "Suppress Combat Music"
+  "VGMusic.Settings.SuppressCombat.Name": "Suppress Combat Music",
+  "VGMusic.UI.Reset": "Reset",
+  "VGMusic.UI.Save": "Save"
 }

@@ -1,103 +1,163 @@
 /* VGMusic Styles */
 :root {
-  --vgmusic-border-groove: 2px groove #eeede0;
-  --vgmusic-border-dotted: 1px dotted black;
-  --vgmusic-spacing: 8px;
+  --vgmusic-border-groove: 0.125rem groove rgb(238 237 224);
+  --vgmusic-border-dotted: 0.0625rem dotted rgb(0 0 0);
+  --vgmusic-spacing: 0.5rem;
+  --vgmusic-accent: rgb(0 102 204);
 }
 
 .vgmusic-config {
-  min-width: 480px;
+  min-width: 30rem;
+
+  .playlist-section {
+    display: flex;
+    flex: 0 0 6rem;
+    padding: 0.125rem;
+    border: var(--vgmusic-border-groove);
+    margin-bottom: var(--vgmusic-spacing);
+
+    > label {
+      flex: 0 0 6rem;
+      font-weight: bold;
+      align-self: center;
+    }
+
+    &.drop-hover {
+      border-color: var(--vgmusic-accent);
+      background-color: rgb(0 102 204 / 10%);
+      transform: scale(1.02);
+      transition: all 0.2s ease;
+    }
+  }
+
+  .playlist-box {
+    display: flex;
+    flex: 1 1 13.25rem;
+    flex-flow: row nowrap;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    padding: 0.125rem;
+    border-left: var(--vgmusic-border-dotted);
+  }
+
+  .item-content {
+    flex: 1;
+    margin-right: 0.25rem;
+  }
+
+  .playlist-item {
+    flex: 1;
+    display: block;
+    margin-bottom: var(--vgmusic-spacing);
+
+    > * {
+      margin-right: 0.25rem;
+    }
+  }
+
+  .initial-track {
+    margin-right: 0.25rem;
+    flex: 1;
+  }
+
+  .priority {
+    flex: 0 0 5rem;
+  }
+
+  .control {
+    flex: 0;
+    align-self: center;
+  }
+
+  .disabled {
+    opacity: 0.5;
+    font-style: italic;
+  }
+
+  .help {
+    margin-top: var(--vgmusic-spacing);
+    padding: var(--vgmusic-spacing);
+    background: rgb(0 0 0 / 5%);
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+
+    i {
+      margin-right: 0.25rem;
+      color: var(--vgmusic-accent);
+    }
+  }
+
+  /* Form styling */
+  .form-group.stacked {
+    flex-direction: column;
+    align-items: flex-start;
+
+    label {
+      margin-bottom: 0.125rem;
+      font-size: 0.8em;
+    }
+  }
+
+  .flexrow {
+    gap: var(--vgmusic-spacing);
+  }
+
+  /* Drag and Drop Styles */
+  .playlist-section-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin-bottom: var(--vgmusic-spacing);
+    }
+  }
+
+  .playlist-section-item {
+    &[draggable='true'] {
+      cursor: move;
+
+      &:hover {
+        border-color: var(--vgmusic-accent);
+      }
+    }
+
+    &[draggable='false'] {
+      opacity: 0.7;
+    }
+  }
+
+  .dragging {
+    opacity: 0.5;
+    transform: rotate(2deg);
+  }
+
+  .drop-placeholder {
+    height: 0.125rem;
+    background: var(--vgmusic-accent);
+    margin: 0.25rem 0;
+    border-radius: 0.0625rem;
+    animation: pulse 1s infinite;
+  }
+
+  .not-sortable .playlist-section-item {
+    cursor: default;
+  }
 }
 
-.vgmusic-config .playlist-section {
-  display: flex;
-  flex: 0 0 96px;
-  padding: 2px;
-  border: var(--vgmusic-border-groove);
-  margin-bottom: var(--vgmusic-spacing);
-}
-
-.vgmusic-config .playlist-section > label {
-  flex: 0 0 96px;
-  font-weight: bold;
-  align-self: center;
-}
-
-.vgmusic-config .playlist-box {
-  display: flex;
-  flex: 1 1 212px;
-  flex-flow: row nowrap;
-  overflow: hidden;
-  justify-content: center;
-  align-items: center;
-  padding: 2px;
-  border-left: var(--vgmusic-border-dotted);
-}
-
-.vgmusic-config .item-content {
-  flex: 1;
-  margin-right: 4px;
-}
-
-.vgmusic-config .playlist-item {
-  flex: 1;
-  display: block;
-  margin-bottom: var(--vgmusic-spacing);
-}
-
-.vgmusic-config .playlist-item > * {
-  margin-right: 4px;
-}
-
-.vgmusic-config .initial-track {
-  margin-right: 4px;
-  flex: 1;
-}
-
-.vgmusic-config .priority {
-  flex: 0 0 80px;
-}
-
-.vgmusic-config .control {
-  flex: 0;
-  align-self: center;
-}
-
-.vgmusic-config .disabled {
-  color: rgb(0 0 0 / 50%);
-  font-style: italic;
-}
-
-.vgmusic-config .help {
-  margin-top: var(--vgmusic-spacing);
-  padding: var(--vgmusic-spacing);
-  background: rgb(0 0 0 / 5%);
-  border-radius: 4px;
-  font-size: 0.9em;
-}
-
-.vgmusic-config .help i {
-  margin-right: 4px;
-  color: #06c;
-}
-
-/* Form styling */
-.vgmusic-config .form-group.stacked {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.vgmusic-config .form-group.stacked label {
-  margin-bottom: 2px;
-  font-size: 0.8em;
-  color: #666;
-}
-
-.vgmusic-config .flexrow {
-  gap: var(--vgmusic-spacing);
-}
-
-/* Scene config button */
+/* Scene config button - outside of vgmusic-config since it's in a different context */
 .scene-config button[data-action='vgmusic-scene'] {
   margin-left: var(--vgmusic-spacing);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }

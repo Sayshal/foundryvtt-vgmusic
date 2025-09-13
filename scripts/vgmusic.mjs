@@ -8,7 +8,7 @@ Hooks.once('init', async () => {
   game.vgmusic = { musicController: new MusicController(), VGMusicConfig: VGMusicConfig };
   registerSettings();
   registerKeybindings();
-  await loadTemplates(['modules/foundryvtt-vgmusic/templates/music-config.hbs', 'modules/foundryvtt-vgmusic/templates/playlist-section.hbs']);
+  await loadTemplates(['modules/foundryvtt-vgmusic/templates/music-config.hbs']);
 });
 
 Hooks.on('getSceneControlButtons', getSceneControlButtons);
