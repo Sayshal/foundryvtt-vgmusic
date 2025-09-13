@@ -47,14 +47,6 @@
   "license": "https://github.com/Sayshal/foundryvtt-vgmusic?tab=License-1-ov-file",
   "manifest": "https://github.com/Sayshal/foundryvtt-vgmusic/releases/latest/module.json",
   "readme": "https://github.com/Sayshal/foundryvtt-vgmusic?tab=readme-ov-file",
-  "relationships": {
-    "requires": [
-      {
-        "id": "lib-wrapper",
-        "type": "module"
-      }
-    ]
-  },
   "styles": [
     "styles/vgmusic.css"
   ],

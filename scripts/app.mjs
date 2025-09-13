@@ -16,24 +16,45 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static DEFAULT_OPTIONS = {
     id: 'vgmusic-config',
-    classes: ['vgmusic-config'],
     title: 'VGMusic.ConfigTitle',
-    width: 480,
-    height: 360,
+    classes: ['vgmusic-config'],
+    position: { height: 'auto', width: 480, top: 100, left: 200 },
     resizable: true,
     actions: {
       openPlaylist: VGMusicConfig.#openPlaylist,
       deletePlaylist: VGMusicConfig.#deletePlaylist
     },
+    window: { icon: 'fas fa-music', resizable: true, minimizable: true },
     dragDrop: [{ dropSelector: '.playlist-section' }]
   };
 
+  /**
+   * Application constructor
+   * @param {Object} object - The document to configure
+   * @param {Object} options - Application options
+   */
   constructor(object, options = {}) {
+    console.log('VGMusicConfig | Constructor called with:', { object, options });
+
     super(options);
     this.document = object || game.settings.get(CONST.moduleId, CONST.settings.defaultMusic);
-    if (this.document.apps) this.document.apps[this.appId] = this;
+
+    console.log('VGMusicConfig | Document set to:', {
+      document: this.document,
+      documentName: this.document.documentName,
+      documentType: this.document.constructor.name
+    });
+
+    if (this.document.apps) {
+      this.document.apps[this.appId] = this;
+      console.log('VGMusicConfig | Added to document apps');
+    }
   }
 
+  /**
+   * Get the application title
+   * @returns {string} Localized title
+   */
   get title() {
     return game.i18n.localize('VGMusic.ConfigTitle');
   }
@@ -46,32 +67,91 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     return this.document instanceof foundry.abstract.Document;
   }
 
-  get data() {
-    return getProperty(this.document, this.updateDataPrefix);
+  /**
+   * Prepare data for the template context
+   * @returns {Promise<Object>} - The template context
+   * @protected
+   */
+  async _prepareContext() {
+    console.log('VGMusicConfig | _prepareContext called');
+    console.log('VGMusicConfig | Document name for sections lookup:', this.document.documentName);
+
+    try {
+      const sections = CONST.playlistSections[this.document.documentName];
+      console.log('VGMusicConfig | Found sections:', sections);
+
+      if (!sections) {
+        console.warn('VGMusicConfig | No sections found for document type:', this.document.documentName);
+        return { playlists: [] };
+      }
+
+      console.log('VGMusicConfig | Getting data from prefix:', this.updateDataPrefix);
+      const data = getProperty(this.document, this.updateDataPrefix) || {};
+      console.log('VGMusicConfig | Retrieved data:', data);
+
+      const playlists = Object.entries(sections).map(([key, config]) => {
+        console.log('VGMusicConfig | Processing section:', key, config);
+
+        const playlistId = getProperty(data, `music.${key}.playlist`);
+        console.log('VGMusicConfig | Playlist ID for', key, ':', playlistId);
+
+        const playlist = playlistId ? game.playlists.get(playlistId) : null;
+        console.log('VGMusicConfig | Found playlist:', playlist?.name || 'none');
+
+        const tracks =
+          playlist?.playbackOrder?.map((id) => {
+            const track = playlist.sounds.get(id);
+            return { id, name: track.name };
+          }) || [];
+
+        console.log('VGMusicConfig | Tracks for', key, ':', tracks.length);
+
+        const sectionData = getProperty(data, `music.${key}`) || {};
+        console.log('VGMusicConfig | Section data for', key, ':', sectionData);
+
+        return {
+          key,
+          label: game.i18n.localize(config.label),
+          playlist,
+          tracks,
+          data: sectionData,
+          allowPriority: true
+        };
+      });
+
+      console.log('VGMusicConfig | Final context prepared:', { playlists });
+      return { playlists };
+    } catch (error) {
+      console.error('VGMusicConfig | Error preparing context:', error);
+      return { playlists: [] };
+    }
   }
 
-  async _prepareContext() {
-    const sections = CONST.playlistSections[this.document.documentName];
+  /**
+   * Setup after render
+   * @param {Object} context - Application context
+   * @param {Object} options - Render options
+   * @protected
+   */
+  _onRender(context, options) {
+    console.log('VGMusicConfig | _onRender called with context:', context);
+    try {
+      // Any post-render setup can go here
+      console.log('VGMusicConfig | Render setup completed');
+    } catch (error) {
+      console.error('VGMusicConfig | Error in _onRender:', error);
+    }
+  }
 
-    const playlists = Object.entries(sections).map(([key, config]) => {
-      const playlist = game.playlists.get(getProperty(this.data, `music.${key}.playlist`));
-      const tracks =
-        playlist?.playbackOrder?.map((id) => {
-          const track = playlist.sounds.get(id);
-          return { id, name: track.name };
-        }) || [];
-
-      return {
-        key,
-        label: game.i18n.localize(config.label),
-        playlist,
-        tracks,
-        data: getProperty(this.data, `music.${key}`) || {},
-        allowPriority: true
-      };
-    });
-
-    return { playlists };
+  /**
+   * Clean up when the application is closed
+   * @param {Object} options - Closing options
+   * @protected
+   */
+  _onClose(options) {
+    if (this.document.apps) delete this.document.apps[this.appId];
+    game.vgmusic?.musicController?.playCurrentTrack();
+    super._onClose(options);
   }
 
   async _onDrop(event) {
@@ -98,7 +178,8 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       [`music.${section}.initialTrack`]: sound?.id || ''
     };
 
-    const prevData = getProperty(this.data, `music.${section}`);
+    const currentData = getProperty(this.document, this.updateDataPrefix) || {};
+    const prevData = getProperty(currentData, `music.${section}`);
     if (!prevData?.priority) {
       updateData[`music.${section}.priority`] = sectionConfig.priority;
     }
@@ -107,16 +188,22 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   async updateObject(data) {
+    console.log('VGMusicConfig | updateObject called with:', data);
+
     const expandedData = Object.entries(data).reduce((acc, [key, value]) => {
       acc[`${this.updateDataPrefix}.${key}`] = value;
       return acc;
     }, {});
 
+    console.log('VGMusicConfig | Expanded data:', expandedData);
+
     if (this.isDocument) {
+      console.log('VGMusicConfig | Updating document');
       return this.document.update(expandedData);
     }
 
     if (this.document.documentName === 'DefaultMusic') {
+      console.log('VGMusicConfig | Updating default music settings');
       const prevData = game.settings.get(CONST.moduleId, CONST.settings.defaultMusic);
       const updateData = foundry.utils.mergeObject(prevData, foundry.utils.expandObject(expandedData), {
         inplace: false,
@@ -130,22 +217,19 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   async _processSubmit(event, form, formData) {
+    console.log('VGMusicConfig | _processSubmit called with:', formData);
     await this.updateObject(formData.object);
   }
 
-  async close(...args) {
-    if (this.document.apps) delete this.document.apps[this.appId];
-    game.vgmusic?.musicController?.playCurrentTrack();
-    return super.close(...args);
-  }
-
   static async #openPlaylist(event, target) {
+    console.log('VGMusicConfig | Open playlist action triggered');
     const playlistId = target.closest('.playlist-section').dataset.itemId;
     const playlist = game.playlists.get(playlistId);
     if (playlist) playlist.sheet.render(true);
   }
 
   static async #deletePlaylist(event, target) {
+    console.log('VGMusicConfig | Delete playlist action triggered');
     const app = target.closest('[data-application-id]');
     const appInstance = ui.windows[app.dataset.applicationId];
     const section = target.closest('.playlist-section').dataset.section;
@@ -155,68 +239,114 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 }
 
 /**
- * Initialize module hooks and patches
+ * Add scene control buttons for music controls
  */
-export function initializeModule() {
-  // Patch ActorSheet to add music button
-  libWrapper.register(CONST.moduleId, 'ActorSheet.prototype._getHeaderButtons', function (wrapped) {
-    const buttons = wrapped();
-
-    if (game.user.isGM) {
-      buttons.unshift({
-        label: game.i18n.localize('VGMusic.CombatMusic'),
-        class: 'configure-combat-music',
-        icon: 'fas fa-music',
-        onclick: (event) => {
-          event.preventDefault();
-          new VGMusicConfig(this.actor, {
-            top: this.position.top + 40,
-            left: this.position.left + (this.position.width - 400) / 2
-          }).render(true);
+export function getSceneControlButtons(controls) {
+  try {
+    if (controls.sounds && controls.sounds.tools) {
+      controls.sounds.tools['suppress-area-music'] = {
+        name: 'suppress-area-music',
+        order: 10,
+        title: 'VGMusic.Controls.SuppressAreaMusic',
+        icon: 'fas fa-dungeon',
+        toggle: true,
+        visible: true,
+        active: game.settings.get(CONST.moduleId, CONST.settings.suppressArea),
+        onChange: (event, active) => {
+          game.settings.set(CONST.moduleId, CONST.settings.suppressArea, active);
         }
-      });
+      };
+
+      controls.sounds.tools['suppress-combat-music'] = {
+        name: 'suppress-combat-music',
+        order: 11,
+        title: 'VGMusic.Controls.SuppressCombatMusic',
+        icon: 'fas fa-fist-raised',
+        toggle: true,
+        visible: true,
+        active: game.settings.get(CONST.moduleId, CONST.settings.suppressCombat),
+        onChange: (event, active) => {
+          game.settings.set(CONST.moduleId, CONST.settings.suppressCombat, active);
+        }
+      };
+    }
+  } catch (error) {
+    console.error('VGMusic | Error adding scene control buttons:', error);
+  }
+}
+
+/**
+ * Add header controls to actor sheets
+ */
+export function getActorSheetHeaderControls(sheet, buttons) {
+  console.log('VGMusic | getActorSheetHeaderControls called', {
+    sheet: sheet?.constructor?.name,
+    isGM: game.user.isGM,
+    buttonsLength: buttons?.length
+  });
+
+  try {
+    if (!game.user.isGM) {
+      console.log('VGMusic | Not GM, skipping header control');
+      return;
     }
 
-    return buttons;
-  });
+    console.log('VGMusic | Adding music button to header controls');
 
-  // Patch Combat to refresh music on turn changes
-  libWrapper.register(CONST.moduleId, 'CONFIG.Combat.documentClass.prototype.setupTurns', function (wrapped, ...args) {
-    const result = wrapped(...args);
-    game.vgmusic?.musicController?.playCurrentTrack();
-    return result;
-  });
+    const clickHandler = (event) => {
+      console.log('VGMusic | Music button clicked!', { event, sheet });
+      try {
+        event.preventDefault();
+        console.log('VGMusic | Creating VGMusicConfig with actor:', sheet.document);
 
-  // Patch SceneControls to add music toggle buttons
-  libWrapper.register(CONST.moduleId, 'SceneControls.prototype._getControlButtons', function (wrapped, ...args) {
-    const result = wrapped(...args);
+        const config = new VGMusicConfig(sheet.document);
 
-    const soundsGroup = result.find((group) => group.name === 'sounds');
-    if (soundsGroup) {
-      soundsGroup.tools.push(
-        {
-          name: 'suppress-area-music',
-          title: 'VGMusic.Controls.SuppressAreaMusic',
-          icon: 'fas fa-dungeon',
-          toggle: true,
-          active: game.settings.get(CONST.moduleId, CONST.settings.suppressArea),
-          onClick: (toggled) => {
-            game.settings.set(CONST.moduleId, CONST.settings.suppressArea, toggled);
-          }
-        },
-        {
-          name: 'suppress-combat-music',
-          title: 'VGMusic.Controls.SuppressCombatMusic',
-          icon: 'fas fa-fist-raised',
-          toggle: true,
-          active: game.settings.get(CONST.moduleId, CONST.settings.suppressCombat),
-          onClick: (toggled) => {
-            game.settings.set(CONST.moduleId, CONST.settings.suppressCombat, toggled);
-          }
-        }
-      );
-    }
+        console.log('VGMusic | VGMusicConfig created:', config);
+        config.render(true);
+        console.log('VGMusicConfig | VGMusicConfig render called');
+      } catch (error) {
+        console.error('VGMusic | Error in onclick handler:', error);
+      }
+    };
 
-    return result;
-  });
+    const musicButton = {
+      label: game.i18n.localize('VGMusic.CombatMusic'),
+      class: 'configure-combat-music',
+      icon: 'fas fa-music',
+      onclick: clickHandler,
+      // Try alternative property names in case onclick doesn't work
+      onClick: clickHandler,
+      action: clickHandler
+    };
+
+    buttons.unshift(musicButton);
+    console.log('VGMusic | Music button added, total buttons:', buttons.length);
+    console.log('VGMusic | Button object:', musicButton);
+  } catch (error) {
+    console.error('VGMusic | Error adding actor sheet header controls:', error);
+  }
+}
+
+/**
+ * Handle scene config rendering
+ */
+export function handleSceneConfigRender(app, html) {
+  try {
+    const playlistSelector = html.querySelector('select[name="playlistSound"]');
+    if (!playlistSelector) return;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.action = 'vgmusic-scene';
+    button.innerHTML = `<i class="fas fa-music"></i> ${game.i18n.localize('VGMusic.CombatMusic')}`;
+
+    playlistSelector.parentElement.insertAdjacentElement('afterend', button);
+
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      new VGMusicConfig(app.object).render(true);
+    });
+  } catch (error) {
+    console.error('VGMusic | Error adding scene config button:', error);
+  }
 }
