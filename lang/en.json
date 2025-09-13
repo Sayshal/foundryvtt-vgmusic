@@ -1,0 +1,52 @@
+{
+  "VGMusic": {
+    "Playlist": "Playlist",
+    "CombatMusic": "Combat Music",
+    "SceneMusic": "Scene Music",
+
+    "ConfigHelp": "Drag and drop playlists onto this window's playlist sections to assign music.",
+    "InitialTrack": "Initial Track",
+    "Priority": "Priority",
+
+    "SETTINGS": {
+      "SilentCombatMusicMode": {
+        "Name": "Silent Combat Music Mode",
+        "Hint": "What to do if combat is currently focused on an actor without a combat track",
+
+        "Options": {
+          "highestPriority": "Play music of the actor with highest priority",
+          "lastActor": "Play combat music of the last actor with one",
+          "area": "Play the area music",
+          "generic": "Play a generic combat music (default or scene combat music)"
+        }
+      },
+
+      "DefaultMusic": {
+        "Name": "Default Music",
+        "Hint": "Various options for default music in certain situations",
+        "Label": "Default Music"
+      }
+    },
+
+    "CONTROLS": {
+      "ToggleAreaMusic": {
+        "Name": "Toggle area music"
+      },
+      "ToggleCombatMusic": {
+        "Name": "Toggle combat music"
+      }
+    },
+
+    "Scene": {
+      "PlaylistSection": {
+        "Combat": "Combat",
+        "Area": "Area"
+      }
+    },
+
+    "SceneControls": {
+      "SupressAreaMusic": "Supress Area Music",
+      "SupressCombatMusic": "Supress Combat Music"
+    }
+  }
+}
