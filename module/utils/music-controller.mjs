@@ -14,11 +14,11 @@ export const MusicController = {
   },
   get currentTrackInfo() {
     if (!this.track) return {};
-    return this.context?.scopeEntity?.getFlag("vgmusic", `playlist.${this.track.parent.id}.${this.track.id}`);
+    return this.context?.scopeEntity?.getFlag('vgmusic', `playlist.${this.track.parent.id}.${this.track.id}`);
   },
 
   get documentNameSortPriority() {
-    return ["Actor", "Scene", "DefaultMusic"];
+    return ['Actor', 'Scene', 'DefaultMusic'];
   },
 
   getAllCurrentPlaylists() {
@@ -27,30 +27,30 @@ export const MusicController = {
     // Get scene area playlist
     const scene = this.currentScene;
     if (scene != null) {
-      const ctx = vgmusic.utils.PlaylistContext.fromDocument(scene, "area", scene);
+      const ctx = vgmusic.utils.PlaylistContext.fromDocument(scene, 'area', scene);
       if (ctx) result.push(ctx);
     }
 
     // Get combat playlists
     const combat = this.currentCombat;
     if (scene != null) {
-      const ctx = vgmusic.utils.PlaylistContext.fromDocument(scene, "combat", combat);
+      const ctx = vgmusic.utils.PlaylistContext.fromDocument(scene, 'combat', combat);
       if (ctx) result.push(ctx);
     }
 
     // Get actor combat playlists
     if (combat != null) {
       for (const combatant of combat.combatants) {
-        const ctx = vgmusic.utils.PlaylistContext.fromDocument(combatant.actor, "combat", combat);
+        const ctx = vgmusic.utils.PlaylistContext.fromDocument(combatant.actor, 'combat', combat);
         if (ctx) result.push(ctx);
       }
     }
 
     // Get default combat playlist
     if (combat != null) {
-      const defaultMusicConfig = game.settings.get("vgmusic", "defaultMusic");
+      const defaultMusicConfig = game.settings.get('vgmusic', 'defaultMusic');
       if (defaultMusicConfig != null) {
-        const ctx = vgmusic.utils.PlaylistContext.fromDocument(defaultMusicConfig, "combat", combat);
+        const ctx = vgmusic.utils.PlaylistContext.fromDocument(defaultMusicConfig, 'combat', combat);
         if (ctx) result.push(ctx);
       }
     }
@@ -61,12 +61,12 @@ export const MusicController = {
   filterPlaylists(ctx) {
     const combat = this.currentCombat;
     // Remove combat track without combat
-    if (ctx.context === "combat" && !combat?.started) return false;
+    if (ctx.context === 'combat' && !combat?.started) return false;
     // Remove combat track with combat music supressed
-    if (ctx.context === "combat" && game.settings.get("vgmusic", "supress.combat") === true) return false;
+    if (ctx.context === 'combat' && game.settings.get('vgmusic', 'supress.combat') === true) return false;
 
     // Remove area track with area music supressed
-    if (ctx.context === "area" && game.settings.get("vgmusic", "supress.area") === true) return false;
+    if (ctx.context === 'area' && game.settings.get('vgmusic', 'supress.area') === true) return false;
 
     return true;
   },
@@ -80,8 +80,8 @@ export const MusicController = {
     if (b.contextEntity === currentActor) return 1;
 
     // Sort to make sure last actor's combat music will be playing
-    const silentMode = game.settings.get("vgmusic", "silentCombatMusicMode");
-    if (silentMode === "lastActor") {
+    const silentMode = game.settings.get('vgmusic', 'silentCombatMusicMode');
+    if (silentMode === 'lastActor') {
       const combatants = combat.turns;
       const startIdx = combat.current.turn;
       if (startIdx >= 0 && combatants.length > 0) {
@@ -95,12 +95,12 @@ export const MusicController = {
           if (b.contextEntity === actor) return 1;
         }
       }
-    } else if (silentMode === "area") {
-      if (a.contextEntity.documentName !== "Actor" && a.context === "area") return -1;
-      if (b.contextEntity.documentName !== "Actor" && b.context === "area") return 1;
-    } else if (silentMode === "generic") {
-      if (a.contextEntity.documentName !== "Actor" && a.context === "combat") return -1;
-      if (b.contextEntity.documentName !== "Actor" && b.context === "combat") return 1;
+    } else if (silentMode === 'area') {
+      if (a.contextEntity.documentName !== 'Actor' && a.context === 'area') return -1;
+      if (b.contextEntity.documentName !== 'Actor' && b.context === 'area') return 1;
+    } else if (silentMode === 'generic') {
+      if (a.contextEntity.documentName !== 'Actor' && a.context === 'combat') return -1;
+      if (b.contextEntity.documentName !== 'Actor' && b.context === 'combat') return 1;
     }
 
     // Sort by priority
@@ -113,9 +113,7 @@ export const MusicController = {
   },
 
   getCurrentPlaylist() {
-    const playlists = this.getAllCurrentPlaylists()
-      .filter(this.filterPlaylists.bind(this))
-      .sort(this.sortPlaylists.bind(this));
+    const playlists = this.getAllCurrentPlaylists().filter(this.filterPlaylists.bind(this)).sort(this.sortPlaylists.bind(this));
     if (playlists.length > 0) return playlists[0];
 
     return null;
@@ -131,12 +129,12 @@ export const MusicController = {
   },
 
   getPlaylistData(entity, playlistId, trackId) {
-    const playlistData = entity.getFlag("vgmusic", `playlist.${playlistId}.${trackId}`);
+    const playlistData = entity.getFlag('vgmusic', `playlist.${playlistId}.${trackId}`);
     if (!playlistData) {
       return {
         id: playlistId,
         trackId,
-        start: 0,
+        start: 0
       };
     }
     return playlistData;
@@ -149,10 +147,10 @@ export const MusicController = {
     if (track == null || entity == null) return;
 
     if (vgmusic.utils.isHeadGM()) {
-      return entity.setFlag("vgmusic", `playlist.${track.parent.id}.${track.id}`, {
+      return entity.setFlag('vgmusic', `playlist.${track.parent.id}.${track.id}`, {
         id: track.parent.id,
         trackId: track.id,
-        start: (track.sound.currentTime ?? 0) % (track.sound.duration ?? 100),
+        start: (track.sound.currentTime ?? 0) % (track.sound.duration ?? 100)
       });
     }
   },
@@ -162,7 +160,7 @@ export const MusicController = {
     const newTrack = playlistContext?.track;
     const fadingTrack = {
       prev: this._fadingTracks.find((o) => o.track === prevTrack) != null,
-      new: this._fadingTracks.find((o) => o.track === newTrack) != null,
+      new: this._fadingTracks.find((o) => o.track === newTrack) != null
     };
 
     if (prevTrack !== newTrack && prevTrack != null) {
@@ -180,7 +178,7 @@ export const MusicController = {
         await newTrack.update({ playing: true, pausedTime: this.currentTrackInfo?.start ?? 0 });
       }
     }
-  },
+  }
 };
 
 export class FadingTrack {

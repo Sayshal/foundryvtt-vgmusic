@@ -1,10 +1,10 @@
 export const patchCombat = function () {
-  const clsPath = "CONFIG.Combat.documentClass";
+  const clsPath = 'CONFIG.Combat.documentClass';
 
   /* -------------------------------------- */
   /* setupTurns
   /* -------------------------------------- */
-  libWrapper.register("vgmusic", `${clsPath}.prototype.setupTurns`, function (wrapped, ...args) {
+  libWrapper.register('vgmusic', `${clsPath}.prototype.setupTurns`, function (wrapped, ...args) {
     const result = wrapped(...args);
 
     // Refresh combat music

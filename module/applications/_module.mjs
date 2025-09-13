@@ -1,1 +1,1 @@
-export { VGMusicConfig } from "./music-config.mjs";
+export { VGMusicConfig } from './music-config.mjs';

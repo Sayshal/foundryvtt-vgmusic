@@ -26,22 +26,22 @@ export class PlaylistContext {
    * @param {string} [type="combat"] - The type of music to get. "area" and "combat" are supported by default.
    * @returns {PlaylistContext|null} The context, or null if no playlist was found.
    */
-  static fromDocument(document, type = "combat", scopeEntity = null) {
+  static fromDocument(document, type = 'combat', scopeEntity = null) {
     // Handle Document
     if (document instanceof foundry.abstract.Document) {
-      const playlistId = document.getFlag("vgmusic", `music.${type}.playlist`);
+      const playlistId = document.getFlag('vgmusic', `music.${type}.playlist`);
       const playlist = playlistId ? game.playlists.get(playlistId) : null;
       if (!playlist) return null;
 
-      const trackId = document.getFlag("vgmusic", `music.${type}.initialTrack`) || null;
-      const priority = document.getFlag("vgmusic", `music.${type}.priority`) ?? 0;
+      const trackId = document.getFlag('vgmusic', `music.${type}.initialTrack`) || null;
+      const priority = document.getFlag('vgmusic', `music.${type}.priority`) ?? 0;
 
       return new this(type, document, playlist, trackId, priority, scopeEntity);
     }
 
     // Handle something else
     else {
-      if (document.documentName === "DefaultMusic") {
+      if (document.documentName === 'DefaultMusic') {
         const section = document.data?.vgmusic?.music?.[type];
         if (!section) return null;
 

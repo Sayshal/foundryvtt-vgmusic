@@ -1,28 +1,28 @@
 export class VGMusicConfig extends FormApplication {
   constructor(object, options) {
-    super(object || game.settings.get("vgmusic", "defaultMusic"), options);
+    super(object || game.settings.get('vgmusic', 'defaultMusic'), options);
 
     if (this.object.apps != null) this.object.apps[this.appId] = this;
   }
 
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
-      title: game.i18n.localize("VGMusic.SceneMusic"),
-      classes: ["scene-music"],
+      title: game.i18n.localize('VGMusic.SceneMusic'),
+      classes: ['scene-music'],
       width: 480,
       height: 360,
-      template: "modules/vgmusic/templates/apps/music-config.hbs",
+      template: 'modules/vgmusic/templates/apps/music-config.hbs',
       closeOnSubmit: false,
       submitOnClose: true,
       submitOnChange: true,
       resizable: true,
-      dragDrop: [{ dropSelector: ".playlist" }],
+      dragDrop: [{ dropSelector: '.playlist' }]
     });
   }
 
   get updateDataPrefix() {
-    if (this.isDocument) return "flags.vgmusic";
-    return "data.vgmusic";
+    if (this.isDocument) return 'flags.vgmusic';
+    return 'data.vgmusic';
   }
 
   get isDocument() {
@@ -46,15 +46,15 @@ export class VGMusicConfig extends FormApplication {
     if (this.isDocument) return this.object.update(data);
 
     // Handle config
-    if (this.object.documentName === "DefaultMusic") {
-      const prevData = game.settings.get("vgmusic", "defaultMusic");
+    if (this.object.documentName === 'DefaultMusic') {
+      const prevData = game.settings.get('vgmusic', 'defaultMusic');
       const updateData = foundry.utils.mergeObject(prevData, foundry.utils.expandObject(data), {
         inplace: false,
-        performDeletions: true,
+        performDeletions: true
       });
 
-      await game.settings.set("vgmusic", "defaultMusic", updateData);
-      this.object = game.settings.get("vgmusic", "defaultMusic");
+      await game.settings.set('vgmusic', 'defaultMusic', updateData);
+      this.object = game.settings.get('vgmusic', 'defaultMusic');
       return this.render();
     }
   }
@@ -63,8 +63,8 @@ export class VGMusicConfig extends FormApplication {
     event.preventDefault();
     const section = event.currentTarget.dataset.section;
 
-    const data = JSON.parse(event.dataTransfer.getData("text/plain"));
-    if (!["Playlist", "PlaylistSound"].includes(data.type)) return;
+    const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+    if (!['Playlist', 'PlaylistSound'].includes(data.type)) return;
     if (!data.uuid) return;
 
     const document = await fromUuid(data.uuid);
@@ -83,7 +83,7 @@ export class VGMusicConfig extends FormApplication {
     const prefix = `music.${section}`;
     const updateData = {
       [`${prefix}.playlist`]: playlist.id,
-      [`${prefix}.initialTrack`]: sound ? sound.id : "",
+      [`${prefix}.initialTrack`]: sound ? sound.id : ''
     };
     if (prevData?.priority == null) updateData[`${prefix}.priority`] = prio;
 
@@ -102,7 +102,7 @@ export class VGMusicConfig extends FormApplication {
         const track = playlist.sounds.get(id);
         return {
           id,
-          name: track.name,
+          name: track.name
         };
       });
 
@@ -112,7 +112,7 @@ export class VGMusicConfig extends FormApplication {
         playlist,
         tracks,
         data: getProperty(this.data, `music.${k}`),
-        allowPriority: true,
+        allowPriority: true
       };
     });
 
@@ -122,20 +122,20 @@ export class VGMusicConfig extends FormApplication {
   activateListeners(html) {
     super.activateListeners(html);
 
-    html.find(".playlist .control .delete").on("click", this._onDeletePlaylist.bind(this));
-    html.find(`*[data-action="open-playlist"]`).on("click", this._onOpenPlaylist.bind(this));
+    html.find('.playlist .control .delete').on('click', this._onDeletePlaylist.bind(this));
+    html.find(`*[data-action="open-playlist"]`).on('click', this._onOpenPlaylist.bind(this));
   }
 
   async _onDeletePlaylist(event) {
     event.preventDefault();
-    const section = event.currentTarget.closest(".playlist").dataset.section;
+    const section = event.currentTarget.closest('.playlist').dataset.section;
     await this.updateObject({ [`music.-=${section}`]: null });
   }
 
   _onOpenPlaylist(event) {
     event.preventDefault();
 
-    const playlistId = event.currentTarget.closest(".playlist").dataset.itemId;
+    const playlistId = event.currentTarget.closest('.playlist').dataset.itemId;
     const playlist = game.playlists.get(playlistId);
     if (playlist) playlist.sheet.render(true);
   }

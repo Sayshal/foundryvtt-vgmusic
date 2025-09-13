@@ -1,24 +1,21 @@
 {
-  "name": "vgmusic",
-  "title": "Video Game Music",
-  "description": "A playlist addon for FoundryVTT",
-  "version": "0.2.1",
   "authors": [
     {
       "name": "Furyspark"
     }
   ],
-  "minimumCoreVersion": "10.277",
-  "compatibleCoreVersion": "10",
-  "scripts": [],
-  "esmodules": ["module/vgmusic.js"],
-  "styles": ["styles/vgmusic.css"],
-  "packs": [],
+  "bugs": "",
+  "changelog": "",
   "dependencies": [
     {
       "name": "lib-wrapper",
       "type": "module"
     }
+  ],
+  "description": "A playlist addon for FoundryVTT",
+  "download": "",
+  "esmodules": [
+    "module/vgmusic.js"
   ],
   "languages": [
     {
@@ -27,14 +24,16 @@
       "path": "lang/en.json"
     }
   ],
-  "socket": false,
-  "url": "",
-  "manifest": "https://gitlab.com/Furyspark/foundryvtt-vgmusic/-/raw/master/src/module.json",
-  "download": "https://gitlab.com/Furyspark/foundryvtt-vgmusic/-/raw/master/releases/0.2.1.zip",
+  "library": false,
   "license": "MIT",
+  "manifest": "",
+  "name": "vgmusic",
   "readme": "",
-  "bugs": "",
-  "changelog": "",
-  "system": [],
-  "library": false
+  "socket": false,
+  "styles": [
+    "styles/vgmusic.css"
+  ],
+  "title": "Video Game Music",
+  "url": "",
+  "version": ""
 }

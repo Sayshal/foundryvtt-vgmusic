@@ -1,1 +1,1 @@
-import "./vgmusic.mjs";
+import './vgmusic.mjs';
