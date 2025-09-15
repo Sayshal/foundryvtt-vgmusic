@@ -1,5 +1,6 @@
 import { CONST } from './config.mjs';
 import { getProperty } from './helpers.mjs';
+import { migrateAllVGMusicFlags, migrateVGMusicFlags, needsMigration } from './helpers.mjs';
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const { DragDrop } = foundry.applications.ux;
@@ -19,7 +20,7 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       closeOnSubmit: false,
       submitOnChange: false
     },
-    position: { width: 480, height: 'auto', top: 75 },
+    position: { width: 'auto', height: 'auto' },
     actions: {
       reset: VGMusicConfig.handleReset,
       openPlaylist: VGMusicConfig.openPlaylist,
@@ -54,6 +55,12 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(object, options = {}) {
     super(options);
     this.document = object || game.settings.get(CONST.moduleId, CONST.settings.defaultMusic);
+    if (game.user.isGM && this.isDocument && needsMigration(this.document)) {
+      console.log(`VGMusic | Auto-migrating ${this.document.name} before opening config`);
+      migrateVGMusicFlags(this.document).then(() => {
+        if (this.rendered) this.render();
+      });
+    }
   }
 
   get updateDataPrefix() {
@@ -434,6 +441,7 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     if (Object.keys(updateData).length > 0) {
       try {
         await this.updateObject(updateData);
+        game.vgmusic?.musicController?.playCurrentTrack();
         this.close();
       } catch (error) {
         console.error('VGMusic | Error updating data:', error);
@@ -544,9 +552,37 @@ export function handleCanvasReady() {
   game.vgmusic?.musicController?.playCurrentTrack();
 }
 
-export async function handleUpdateScene(scene, updateData) {
-  if ('active' in updateData) {
-    if (updateData.active !== true) await scene.unsetFlag(CONST.moduleId, 'playlist');
+// Add this new handler for any scene updates (not just active changes)
+export function handleUpdateScene(scene, updateData) {
+  // Trigger on any scene update that affects music flags
+  if ('flags' in updateData && updateData.flags?.[CONST.moduleId]) {
     game.vgmusic?.musicController?.playCurrentTrack();
   }
+
+  // Also trigger when scene becomes active
+  if ('active' in updateData) {
+    if (updateData.active !== true) {
+      // Scene deactivated - clear its playlist data
+      scene.unsetFlag(CONST.moduleId, 'playlist').catch(() => {});
+    }
+    game.vgmusic?.musicController?.playCurrentTrack();
+  }
+}
+
+// Add this new handler for actor updates
+export function handleUpdateActor(actor, updateData) {
+  // Trigger on any actor update that affects music flags
+  if ('flags' in updateData && updateData.flags?.[CONST.moduleId]) {
+    game.vgmusic?.musicController?.playCurrentTrack();
+  }
+}
+
+// Add this for initial music setup
+export async function handleReady() {
+  if (game.user.isGM) await migrateAllVGMusicFlags();
+
+  // Start music when the game is ready (initial load)
+  setTimeout(() => {
+    game.vgmusic?.musicController?.playCurrentTrack();
+  }, 1000); // Small delay to ensure everything is loaded
 }
