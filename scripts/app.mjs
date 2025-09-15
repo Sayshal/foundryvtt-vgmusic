@@ -1,6 +1,5 @@
 import { CONST } from './config.mjs';
 import { getProperty } from './helpers.mjs';
-import { migrateAllVGMusicFlags, migrateVGMusicFlags, needsMigration } from './helpers.mjs';
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const { DragDrop } = foundry.applications.ux;
@@ -43,7 +42,7 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   };
 
   /** @override */
-  static PARTS = { form: { template: 'modules/foundryvtt-vgmusic/templates/music-config.hbs' } };
+  static PARTS = { form: { template: 'modules/vgmusic/templates/music-config.hbs' } };
 
   config = [];
 
@@ -55,16 +54,10 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(object, options = {}) {
     super(options);
     this.document = object || game.settings.get(CONST.moduleId, CONST.settings.defaultMusic);
-    if (game.user.isGM && this.isDocument && needsMigration(this.document)) {
-      console.log(`VGMusic | Auto-migrating ${this.document.name} before opening config`);
-      migrateVGMusicFlags(this.document).then(() => {
-        if (this.rendered) this.render();
-      });
-    }
   }
 
   get updateDataPrefix() {
-    return this.isDocument ? 'flags.foundryvtt-vgmusic' : 'data.vgmusic';
+    return this.isDocument ? 'flags.vgmusic' : 'data.vgmusic';
   }
 
   get isDocument() {
@@ -554,7 +547,6 @@ export function handleUpdateActor(actor, updateData) {
 }
 
 export async function handleReady() {
-  if (game.user.isGM) await migrateAllVGMusicFlags();
   setTimeout(() => {
     game.vgmusic?.musicController?.playCurrentTrack();
   }, 1000);

@@ -2,7 +2,7 @@
  * Configuration constants for the VGMusic module
  */
 export const CONST = {
-  moduleId: 'foundryvtt-vgmusic',
+  moduleId: 'vgmusic',
 
   settings: {
     silentCombatMusicMode: 'silentCombatMusicMode',

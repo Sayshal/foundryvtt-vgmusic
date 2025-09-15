@@ -21,23 +21,13 @@ export function isHeadGM() {
 }
 
 /**
- * Get property from object using dot notation, with migration fallback
+ * Get property from object using dot notation
  * @param {Object} object - Source object
  * @param {string} path - Dot notation path
  * @returns {*} Property value
  */
 export function getProperty(object, path) {
-  const result = foundry.utils.getProperty(object, path);
-  if (result !== undefined) return result;
-  if (path.includes('flags.foundryvtt-vgmusic')) {
-    const oldPath = path.replace('flags.foundryvtt-vgmusic', 'flags.vgmusic');
-    const oldResult = foundry.utils.getProperty(object, oldPath);
-    if (oldResult !== undefined) {
-      console.log(`VGMusic | Found data in old location for "${path}", migration needed`);
-      return oldResult;
-    }
-  }
-  return result;
+  return foundry.utils.getProperty(object, path);
 }
 
 /**
@@ -169,64 +159,4 @@ export class FadingTrack {
       if (controller.currentTrack === this.track) controller.playCurrentTrack();
     }
   }
-}
-
-/**
- * Migrate old VGMusic flag data from 'vgmusic' to 'foundryvtt-vgmusic'
- * @param {Document} document - Document to migrate
- * @returns {boolean} True if migration was performed
- */
-export async function migrateVGMusicFlags(document) {
-  try {
-    const oldFlags = document.flags?.vgmusic;
-    const newFlags = document.flags?.[CONST.moduleId];
-    if (!oldFlags || newFlags) return false;
-    console.log(`VGMusic | Migrating flags for ${document.documentName} "${document.name}"`);
-    console.log('Old data:', oldFlags);
-    await document.setFlag(CONST.moduleId, 'music', oldFlags.music);
-    if (oldFlags.playlist) await document.setFlag(CONST.moduleId, 'playlist', oldFlags.playlist);
-    await document.unsetFlag('vgmusic');
-    console.log(`VGMusic | Successfully migrated flags for "${document.name}"`);
-    return true;
-  } catch (error) {
-    console.error(`VGMusic | Error migrating flags for "${document.name}":`, error);
-    return false;
-  }
-}
-
-/**
- * Migrate all documents in the world
- */
-export async function migrateAllVGMusicFlags() {
-  console.log('VGMusic | Starting world migration...');
-  let migratedCount = 0;
-  for (const scene of game.scenes) if (await migrateVGMusicFlags(scene)) migratedCount++;
-  for (const actor of game.actors) if (await migrateVGMusicFlags(actor)) migratedCount++;
-  const oldSettingKey = 'vgmusic.defaultMusic';
-  if (game.settings.settings.has(oldSettingKey)) {
-    try {
-      const oldDefaultMusic = game.settings.get('vgmusic', 'defaultMusic');
-      if (oldDefaultMusic) {
-        await game.settings.set(CONST.moduleId, CONST.settings.defaultMusic, oldDefaultMusic);
-        console.log('VGMusic | Migrated default music settings');
-        migratedCount++;
-      }
-    } catch (error) {
-      console.warn('VGMusic | Could not migrate old default music settings:', error);
-    }
-  }
-
-  if (migratedCount > 0) ui.notifications.info(`VGMusic | Migrated ${migratedCount} documents from old format`);
-  return migratedCount;
-}
-
-/**
- * Check if document has old format data that needs migration
- * @param {Document} document - Document to check
- * @returns {boolean} True if migration is needed
- */
-export function needsMigration(document) {
-  const oldFlags = document.flags?.vgmusic;
-  const newFlags = document.flags?.[CONST.moduleId];
-  return !!(oldFlags && !newFlags);
 }
