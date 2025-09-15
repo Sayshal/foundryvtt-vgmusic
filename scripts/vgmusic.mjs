@@ -5,6 +5,7 @@ import {
   VGMusicConfig,
   getSceneControlButtons,
   getActorSheetHeaderControls,
+  getTidySheetHeaderControls,
   handleSceneConfigRender,
   handleUpdateCombat,
   handleDeleteCombat,
@@ -22,6 +23,7 @@ Hooks.once('init', async () => {
   await loadTemplates(['modules/foundryvtt-vgmusic/templates/music-config.hbs']);
 });
 Hooks.once('ready', handleReady);
+Hooks.once('tidy5e-sheet.ready', getTidySheetHeaderControls);
 Hooks.on('getSceneControlButtons', getSceneControlButtons);
 Hooks.on('getHeaderControlsBaseActorSheet', getActorSheetHeaderControls);
 Hooks.on('renderSceneConfig', handleSceneConfigRender);

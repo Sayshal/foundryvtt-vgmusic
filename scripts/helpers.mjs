@@ -202,12 +202,20 @@ export async function migrateAllVGMusicFlags() {
   let migratedCount = 0;
   for (const scene of game.scenes) if (await migrateVGMusicFlags(scene)) migratedCount++;
   for (const actor of game.actors) if (await migrateVGMusicFlags(actor)) migratedCount++;
-  const oldDefaultMusic = game.settings.get('vgmusic', 'defaultMusic');
-  if (oldDefaultMusic) {
-    await game.settings.set(CONST.moduleId, CONST.settings.defaultMusic, oldDefaultMusic);
-    console.log('VGMusic | Migrated default music settings');
-    migratedCount++;
+  const oldSettingKey = 'vgmusic.defaultMusic';
+  if (game.settings.settings.has(oldSettingKey)) {
+    try {
+      const oldDefaultMusic = game.settings.get('vgmusic', 'defaultMusic');
+      if (oldDefaultMusic) {
+        await game.settings.set(CONST.moduleId, CONST.settings.defaultMusic, oldDefaultMusic);
+        console.log('VGMusic | Migrated default music settings');
+        migratedCount++;
+      }
+    } catch (error) {
+      console.warn('VGMusic | Could not migrate old default music settings:', error);
+    }
   }
+
   if (migratedCount > 0) ui.notifications.info(`VGMusic | Migrated ${migratedCount} documents from old format`);
   return migratedCount;
 }

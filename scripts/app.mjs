@@ -481,6 +481,21 @@ export function getActorSheetHeaderControls(sheet, buttons) {
   }
 }
 
+export function getTidySheetHeaderControls(api) {
+  api.registerActorHeaderControls?.({
+    controls: [
+      {
+        icon: 'fas fa-music',
+        label: game.i18n.localize('VGMusic.CombatMusic'),
+        async onClickAction() {
+          if (!game.user.isGM) return;
+          new VGMusicConfig(this.document).render(true);
+        }
+      }
+    ]
+  });
+}
+
 export function handleSceneConfigRender(app, html) {
   try {
     const playlistSoundSelect = html.querySelector('select[name="playlistSound"]');
