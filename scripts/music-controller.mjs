@@ -12,16 +12,15 @@ export class MusicController {
   }
 
   get currentCombat() {
-    const combat = game.combats.find((combat) => combat.scene === this.currentScene) || game.combats.find((combat) => combat.active);
+    return game.combats.find((combat) => combat.scene === this.currentScene) || game.combats.find((combat) => combat.active);
   }
+
   get currentScene() {
-    const scene = game.scenes.find((scene) => scene.active);
-    return scene;
+    return game.scenes.find((scene) => scene.active);
   }
 
   get currentTrack() {
-    const track = this.currentContext?.track;
-    return track;
+    return this.currentContext?.track;
   }
 
   get currentTrackInfo() {
@@ -199,10 +198,7 @@ export class MusicController {
   async playMusic(context) {
     const prevTrack = this.currentTrack;
     const newTrack = context?.track;
-    const isFading = {
-      prev: this.fadingTracks.some((ft) => ft.track === prevTrack),
-      new: this.fadingTracks.some((ft) => ft.track === newTrack)
-    };
+    const isFading = { prev: this.fadingTracks.some((ft) => ft.track === prevTrack), new: this.fadingTracks.some((ft) => ft.track === newTrack) };
     if (prevTrack !== newTrack && prevTrack) {
       await this.savePlaylistData(this.currentContext?.scopeEntity);
       if (this.isAudioReady()) await prevTrack.update({ playing: false, pausedTime: null });
