@@ -8,24 +8,57 @@ export class MusicController {
   constructor() {
     this.currentContext = null;
     this.fadingTracks = [];
+    this.pendingPlayback = null;
   }
 
   get currentCombat() {
-    return game.combats.find((combat) => combat.scene === this.currentScene);
+    const combat = game.combats.find((combat) => combat.scene === this.currentScene) || game.combats.find((combat) => combat.active);
   }
-
   get currentScene() {
-    return game.scenes.find((scene) => scene.active);
+    const scene = game.scenes.find((scene) => scene.active);
+    return scene;
   }
 
   get currentTrack() {
-    return this.currentContext?.track;
+    const track = this.currentContext?.track;
+    return track;
   }
 
   get currentTrackInfo() {
     if (!this.currentTrack) return {};
     const track = this.currentTrack;
-    return this.currentContext?.scopeEntity?.getFlag(CONST.moduleId, `playlist.${track.parent.id}.${track.id}`);
+    const info = this.currentContext?.scopeEntity?.getFlag(CONST.moduleId, `playlist.${track.parent.id}.${track.id}`);
+    return info;
+  }
+
+  /**
+   * Check if game audio is ready for playback
+   * @returns {boolean} True if audio is unlocked
+   */
+  isAudioReady() {
+    return game.audio && !game.audio.locked;
+  }
+
+  /**
+   * Wait for audio to be ready or defer playback
+   * @param {Function} playCallback - Function to call when audio is ready
+   */
+  async waitForAudio(playCallback) {
+    if (this.isAudioReady()) {
+      await playCallback();
+    } else {
+      this.pendingPlayback = playCallback;
+      const onAudioUnlock = async () => {
+        if (this.pendingPlayback) {
+          await this.pendingPlayback();
+          this.pendingPlayback = null;
+        }
+        document.removeEventListener('click', onAudioUnlock);
+        document.removeEventListener('keydown', onAudioUnlock);
+      };
+      document.addEventListener('click', onAudioUnlock, { once: true });
+      document.addEventListener('keydown', onAudioUnlock, { once: true });
+    }
   }
 
   /**
@@ -46,8 +79,10 @@ export class MusicController {
     }
     if (combat) {
       for (const combatant of combat.combatants) {
-        const ctx = PlaylistContext.fromDocument(combatant.actor, 'combat', combat);
-        if (ctx) contexts.push(ctx);
+        if (combatant.actor) {
+          const ctx = PlaylistContext.fromDocument(combatant.actor, 'combat', combat);
+          if (ctx) contexts.push(ctx);
+        }
       }
     }
     if (combat) {
@@ -70,7 +105,6 @@ export class MusicController {
     if (context.context === 'combat' && !combat?.started) return false;
     if (context.context === 'combat' && game.settings.get(CONST.moduleId, CONST.settings.suppressCombat)) return false;
     if (context.context === 'area' && game.settings.get(CONST.moduleId, CONST.settings.suppressArea)) return false;
-
     return true;
   }
 
@@ -118,8 +152,11 @@ export class MusicController {
    * @returns {PlaylistContext|null} Current context or null
    */
   getCurrentPlaylist() {
-    const contexts = this.getAllCurrentPlaylists().filter(this.filterPlaylists.bind(this)).sort(this.sortPlaylists.bind(this));
-    return contexts.length > 0 ? contexts[0] : null;
+    const allContexts = this.getAllCurrentPlaylists();
+    const filteredContexts = allContexts.filter(this.filterPlaylists.bind(this));
+    const sortedContexts = filteredContexts.sort(this.sortPlaylists.bind(this));
+    const result = sortedContexts.length > 0 ? sortedContexts[0] : null;
+    return result;
   }
 
   /**
@@ -151,11 +188,8 @@ export class MusicController {
     if (entity instanceof Combat && !game.combats.get(entity.id)) return;
     if (!this.currentTrack || !entity || !isHeadGM()) return;
     const track = this.currentTrack;
-    await entity.setFlag(CONST.moduleId, `playlist.${track.parent.id}.${track.id}`, {
-      id: track.parent.id,
-      trackId: track.id,
-      start: (track.sound?.currentTime ?? 0) % (track.sound?.duration ?? 100)
-    });
+    const flagData = { id: track.parent.id, trackId: track.id, start: (track.sound?.currentTime ?? 0) % (track.sound?.duration ?? 100) };
+    await entity.setFlag(CONST.moduleId, `playlist.${track.parent.id}.${track.id}`, flagData);
   }
 
   /**
@@ -171,7 +205,7 @@ export class MusicController {
     };
     if (prevTrack !== newTrack && prevTrack) {
       await this.savePlaylistData(this.currentContext?.scopeEntity);
-      await prevTrack.update({ playing: false, pausedTime: null });
+      if (this.isAudioReady()) await prevTrack.update({ playing: false, pausedTime: null });
       if (prevTrack.fadeDuration > 0 && !isFading.prev) this.fadingTracks.push(new FadingTrack(prevTrack, prevTrack.fadeDuration));
       this.currentContext = null;
     }
@@ -179,7 +213,9 @@ export class MusicController {
       this.currentContext = context;
       if (!isFading.new) {
         const startTime = this.currentTrackInfo?.start ?? 0;
-        await newTrack.update({ playing: true, pausedTime: startTime });
+        await this.waitForAudio(async () => {
+          await newTrack.update({ playing: true, pausedTime: startTime });
+        });
       }
     }
   }

@@ -37,7 +37,6 @@ export function getProperty(object, path) {
       return oldResult;
     }
   }
-
   return result;
 }
 
@@ -107,6 +106,60 @@ export class FadingTrack {
     this.fadeDuration = fadeDuration;
     setTimeout(() => this.delete(), this.fadeDuration + 10);
   }
+
+  /**
+   * Start the fade operation
+   */
+  async startFade() {
+    if (!this.track) {
+      this.delete();
+      return;
+    }
+    try {
+      if (this.direction === 'out') await this.fadeOut();
+      else if (this.direction === 'in') await this.fadeIn();
+    } catch (error) {
+      console.error('FadingTrack | Error during fade:', error);
+      if (this.direction === 'out') await this.track.update({ playing: false, pausedTime: null });
+    }
+    this.delete();
+  }
+
+  /**
+   * Perform fade out operation
+   */
+  async fadeOut() {
+    if (!this.track.playing) return;
+    const startVolume = this.track.volume;
+    const steps = 20;
+    const stepDuration = this.fadeDuration / steps;
+    const volumeStep = startVolume / steps;
+    for (let i = 0; i < steps; i++) {
+      const newVolume = Math.max(0, startVolume - volumeStep * (i + 1));
+      await this.track.update({ volume: newVolume });
+      await new Promise((resolve) => setTimeout(resolve, stepDuration));
+    }
+    await this.track.update({ playing: false, pausedTime: null, volume: startVolume });
+  }
+
+  /**
+   * Perform fade in operation
+   */
+  async fadeIn() {
+    const steps = 20; // Number of volume steps
+    const stepDuration = this.fadeDuration / steps;
+    const volumeStep = this.targetVolume / steps;
+    await this.track.update({ volume: 0 });
+    for (let i = 0; i < steps; i++) {
+      const newVolume = Math.min(this.targetVolume, volumeStep * (i + 1));
+      await this.track.update({ volume: newVolume });
+      await new Promise((resolve) => setTimeout(resolve, stepDuration));
+    }
+  }
+
+  /**
+   * Remove this fading track from the controller
+   */
   delete() {
     const controller = game.vgmusic?.musicController;
     if (!controller) return;
@@ -127,24 +180,12 @@ export async function migrateVGMusicFlags(document) {
   try {
     const oldFlags = document.flags?.vgmusic;
     const newFlags = document.flags?.[CONST.moduleId];
-
-    // Skip if no old data or new data already exists
     if (!oldFlags || newFlags) return false;
-
     console.log(`VGMusic | Migrating flags for ${document.documentName} "${document.name}"`);
     console.log('Old data:', oldFlags);
-
-    // Copy old data to new flag location
     await document.setFlag(CONST.moduleId, 'music', oldFlags.music);
-
-    // Copy playlist progress data if it exists
-    if (oldFlags.playlist) {
-      await document.setFlag(CONST.moduleId, 'playlist', oldFlags.playlist);
-    }
-
-    // Remove old flag data
+    if (oldFlags.playlist) await document.setFlag(CONST.moduleId, 'playlist', oldFlags.playlist);
     await document.unsetFlag('vgmusic');
-
     console.log(`VGMusic | Successfully migrated flags for "${document.name}"`);
     return true;
   } catch (error) {
@@ -158,40 +199,16 @@ export async function migrateVGMusicFlags(document) {
  */
 export async function migrateAllVGMusicFlags() {
   console.log('VGMusic | Starting world migration...');
-
   let migratedCount = 0;
-
-  // Migrate all scenes
-  for (const scene of game.scenes) {
-    if (await migrateVGMusicFlags(scene)) {
-      migratedCount++;
-    }
+  for (const scene of game.scenes) if (await migrateVGMusicFlags(scene)) migratedCount++;
+  for (const actor of game.actors) if (await migrateVGMusicFlags(actor)) migratedCount++;
+  const oldDefaultMusic = game.settings.get('vgmusic', 'defaultMusic');
+  if (oldDefaultMusic) {
+    await game.settings.set(CONST.moduleId, CONST.settings.defaultMusic, oldDefaultMusic);
+    console.log('VGMusic | Migrated default music settings');
+    migratedCount++;
   }
-
-  // Migrate all actors
-  for (const actor of game.actors) {
-    if (await migrateVGMusicFlags(actor)) {
-      migratedCount++;
-    }
-  }
-
-  // Migrate default music setting
-  try {
-    const oldDefaultMusic = game.settings.get('vgmusic', 'defaultMusic');
-    if (oldDefaultMusic) {
-      await game.settings.set(CONST.moduleId, CONST.settings.defaultMusic, oldDefaultMusic);
-      console.log('VGMusic | Migrated default music settings');
-      migratedCount++;
-    }
-  } catch (error) {
-    // Old setting doesn't exist, that's fine
-  }
-
-  if (migratedCount > 0) {
-    ui.notifications.info(`VGMusic | Migrated ${migratedCount} documents from old format`);
-    console.log(`VGMusic | Migration complete. ${migratedCount} documents migrated.`);
-  }
-
+  if (migratedCount > 0) ui.notifications.info(`VGMusic | Migrated ${migratedCount} documents from old format`);
   return migratedCount;
 }
 

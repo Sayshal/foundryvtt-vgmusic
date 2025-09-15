@@ -82,9 +82,7 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         this.config = [];
         return;
       }
-
       const data = getProperty(this.document, this.updateDataPrefix) || {};
-
       this.config = Object.entries(sections).map(([key, sectionConfig]) => {
         const sectionData = getProperty(data, `music.${key}`) || {};
         const playlistId = sectionData.playlist;
@@ -95,7 +93,6 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
             const track = playlist.sounds.get(id);
             return { id, name: track.name };
           }) || [];
-
         return {
           id: key,
           label: sectionConfig.label,
@@ -108,8 +105,6 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
           sortable: true
         };
       });
-
-      // Sort by order
       this.config.sort((a, b) => a.order - b.order);
     } catch (error) {
       console.error('VGMusic | Error initializing configuration:', error);
@@ -120,23 +115,12 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   /** @override */
   _prepareContext(options) {
     this.initializeConfig();
-
-    const playlistConfig = this.config.map((section, index) => ({
-      ...section,
-      index,
-      labelLocalized: game.i18n.localize(section.label)
-    }));
-
+    const playlistConfig = this.config.map((section, index) => ({ ...section, index, labelLocalized: game.i18n.localize(section.label) }));
     const buttons = [
       { type: 'submit', icon: 'fas fa-save', label: 'VGMusic.UI.Save' },
       { type: 'button', action: 'reset', icon: 'fas fa-undo', label: 'VGMusic.UI.Reset' }
     ];
-
-    return {
-      playlistConfig,
-      buttons,
-      documentType: this.document.documentName
-    };
+    return { playlistConfig, buttons, documentType: this.document.documentName };
   }
 
   /** @override */
@@ -192,15 +176,9 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
         console.error('VGMusic | Drag start blocked - not sortable');
         return false;
       }
-
       this._formState = this._captureFormState();
       const sectionIndex = li.dataset.index;
-
-      const dragData = {
-        type: 'playlist-config-reorder',
-        index: sectionIndex
-      };
-
+      const dragData = { type: 'playlist-config-reorder', index: sectionIndex };
       event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
       li.classList.add('dragging');
       return true;
@@ -285,11 +263,7 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       const [movedItem] = this.config.splice(sourceIndex, 1);
       this.config.splice(newIndex, 0, movedItem);
       this.updatePlaylistOrder();
-      if (this._formState) {
-        for (const section of this.config) {
-          if (section.id in this._formState) section.enabled = this._formState[section.id];
-        }
-      }
+      if (this._formState) for (const section of this.config) if (section.id in this._formState) section.enabled = this._formState[section.id];
       this.render(false);
       return true;
     } catch (error) {
@@ -552,37 +526,21 @@ export function handleCanvasReady() {
   game.vgmusic?.musicController?.playCurrentTrack();
 }
 
-// Add this new handler for any scene updates (not just active changes)
 export function handleUpdateScene(scene, updateData) {
-  // Trigger on any scene update that affects music flags
-  if ('flags' in updateData && updateData.flags?.[CONST.moduleId]) {
-    game.vgmusic?.musicController?.playCurrentTrack();
-  }
-
-  // Also trigger when scene becomes active
+  if ('flags' in updateData && updateData.flags?.[CONST.moduleId]) game.vgmusic?.musicController?.playCurrentTrack();
   if ('active' in updateData) {
-    if (updateData.active !== true) {
-      // Scene deactivated - clear its playlist data
-      scene.unsetFlag(CONST.moduleId, 'playlist').catch(() => {});
-    }
+    if (updateData.active !== true) scene.unsetFlag(CONST.moduleId, 'playlist').catch(() => {});
     game.vgmusic?.musicController?.playCurrentTrack();
   }
 }
 
-// Add this new handler for actor updates
 export function handleUpdateActor(actor, updateData) {
-  // Trigger on any actor update that affects music flags
-  if ('flags' in updateData && updateData.flags?.[CONST.moduleId]) {
-    game.vgmusic?.musicController?.playCurrentTrack();
-  }
+  if ('flags' in updateData && updateData.flags?.[CONST.moduleId]) game.vgmusic?.musicController?.playCurrentTrack();
 }
 
-// Add this for initial music setup
 export async function handleReady() {
   if (game.user.isGM) await migrateAllVGMusicFlags();
-
-  // Start music when the game is ready (initial load)
   setTimeout(() => {
     game.vgmusic?.musicController?.playCurrentTrack();
-  }, 1000); // Small delay to ensure everything is loaded
+  }, 1000);
 }

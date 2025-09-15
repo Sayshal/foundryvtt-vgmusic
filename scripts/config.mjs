@@ -20,26 +20,14 @@ export const CONST = {
 
   playlistSections: {
     DefaultMusic: {
-      combat: {
-        label: 'VGMusic.PlaylistSection.Combat',
-        priority: -5
-      }
+      combat: { label: 'VGMusic.PlaylistSection.Combat', priority: -5 }
     },
     Scene: {
-      area: {
-        label: 'VGMusic.PlaylistSection.Area',
-        priority: -20
-      },
-      combat: {
-        label: 'VGMusic.PlaylistSection.Combat',
-        priority: -10
-      }
+      area: { label: 'VGMusic.PlaylistSection.Area', priority: -20 },
+      combat: { label: 'VGMusic.PlaylistSection.Combat', priority: -10 }
     },
     Actor: {
-      combat: {
-        label: 'VGMusic.PlaylistSection.Combat',
-        priority: 0
-      }
+      combat: { label: 'VGMusic.PlaylistSection.Combat', priority: 0 }
     }
   },
 
