@@ -9,8 +9,8 @@
       "url": "https://github.com/Sayshal"
     }
   ],
-  "bugs": "https://github.com/Sayshal/foundryvtt-vgmusic/issues",
-  "changelog": "https://github.com/Sayshal/foundryvtt-vgmusic/releases",
+  "bugs": "https://github.com/Sayshal/vgmusic/issues",
+  "changelog": "https://github.com/Sayshal/vgmusic/releases",
   "compatibility": {
     "maximum": "13.999",
     "minimum": "13",
@@ -44,13 +44,13 @@
       "path": "lang/en.json"
     }
   ],
-  "license": "https://github.com/Sayshal/foundryvtt-vgmusic?tab=License-1-ov-file",
-  "manifest": "https://github.com/Sayshal/foundryvtt-vgmusic/releases/latest/download/module.json",
-  "readme": "https://github.com/Sayshal/foundryvtt-vgmusic?tab=readme-ov-file",
+  "license": "https://github.com/Sayshal/vgmusic?tab=License-1-ov-file",
+  "manifest": "https://github.com/Sayshal/vgmusic/releases/latest/download/module.json",
+  "readme": "https://github.com/Sayshal/vgmusic?tab=readme-ov-file",
   "styles": [
     "styles/vgmusic.css"
   ],
   "title": "Video Game Music",
-  "url": "https://github.com/Sayshal/foundryvtt-vgmusic",
+  "url": "https://github.com/Sayshal/vgmusic",
   "version": "69.420"
 }
