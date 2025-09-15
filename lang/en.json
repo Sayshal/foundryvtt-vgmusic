@@ -1,6 +1,6 @@
 {
   "VGMusic.CombatMusic": "Combat Music",
-  "VGMusic.ConfigHelp": "Drag and drop playlists onto sections to assign music. Drag sections to reorder them.",
+  "VGMusic.ConfigHelp": "Drag and drop playlists onto sections to assign music.",
   "VGMusic.ConfigTitle": "Music Configuration",
   "VGMusic.Controls.SuppressAreaMusic": "Suppress Area Music",
   "VGMusic.Controls.SuppressCombatMusic": "Suppress Combat Music",
@@ -24,5 +24,6 @@
   "VGMusic.Settings.SuppressArea.Name": "Suppress Area Music",
   "VGMusic.Settings.SuppressCombat.Name": "Suppress Combat Music",
   "VGMusic.UI.Reset": "Reset",
-  "VGMusic.UI.Save": "Save"
+  "VGMusic.UI.Save": "Save",
+  "PLAYLIST.ViewSheet": "Edit Playlist"
 }

@@ -1,163 +1,48 @@
-/* VGMusic Styles */
-:root {
-  --vgmusic-border-groove: 0.125rem groove rgb(238 237 224);
-  --vgmusic-border-dotted: 0.0625rem dotted rgb(0 0 0);
-  --vgmusic-spacing: 0.5rem;
-  --vgmusic-accent: rgb(0 102 204);
-}
-
 .vgmusic-config {
-  min-width: 30rem;
+  min-width: 25rem;
 
   .playlist-section {
-    display: flex;
-    flex: 0 0 6rem;
-    padding: 0.125rem;
-    border: var(--vgmusic-border-groove);
-    margin-bottom: var(--vgmusic-spacing);
+    padding: 0.5rem;
 
-    > label {
-      flex: 0 0 6rem;
-      font-weight: bold;
-      align-self: center;
-    }
-
-    &.drop-hover {
-      border-color: var(--vgmusic-accent);
-      background-color: rgb(0 102 204 / 10%);
-      transform: scale(1.02);
-      transition: all 0.2s ease;
+    &[data-drop-hover='true'] {
+      border-color: var(--color-border-highlight-alt);
+      background: var(--color-bg-highlight-alt);
     }
   }
 
-  .playlist-box {
+  .playlist-info {
     display: flex;
-    flex: 1 1 13.25rem;
-    flex-flow: row nowrap;
-    overflow: hidden;
-    justify-content: center;
     align-items: center;
-    padding: 0.125rem;
-    border-left: var(--vgmusic-border-dotted);
+    gap: 0.5rem;
   }
 
-  .item-content {
+  .playlist-name {
     flex: 1;
-    margin-right: 0.25rem;
+    font-weight: 500;
   }
 
-  .playlist-item {
-    flex: 1;
-    display: block;
-    margin-bottom: var(--vgmusic-spacing);
-
-    > * {
-      margin-right: 0.25rem;
-    }
-  }
-
-  .initial-track {
-    margin-right: 0.25rem;
-    flex: 1;
-  }
-
-  .priority {
-    flex: 0 0 5rem;
-  }
-
-  .control {
-    flex: 0;
-    align-self: center;
-  }
-
-  .disabled {
-    opacity: 0.5;
+  .placeholder {
+    text-align: center;
+    color: var(--color-text-light-secondary);
     font-style: italic;
-  }
 
-  .help {
-    margin-top: var(--vgmusic-spacing);
-    padding: var(--vgmusic-spacing);
-    background: rgb(0 0 0 / 5%);
-    border-radius: 0.25rem;
-    font-size: 0.9em;
-
-    i {
-      margin-right: 0.25rem;
-      color: var(--vgmusic-accent);
-    }
-  }
-
-  /* Form styling */
-  .form-group.stacked {
-    flex-direction: column;
-    align-items: flex-start;
-
-    label {
-      margin-bottom: 0.125rem;
+    .hint {
       font-size: 0.8em;
+      margin-top: 0.25rem;
     }
   }
 
-  .flexrow {
-    gap: var(--vgmusic-spacing);
+  fieldset {
+    margin-bottom: 0.5rem;
   }
 
-  /* Drag and Drop Styles */
-  .playlist-section-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    li {
-      margin-bottom: var(--vgmusic-spacing);
-    }
+  .form-group {
+    margin-bottom: 0.5rem;
   }
 
-  .playlist-section-item {
-    &[draggable='true'] {
-      cursor: move;
-
-      &:hover {
-        border-color: var(--vgmusic-accent);
-      }
-    }
-
-    &[draggable='false'] {
-      opacity: 0.7;
-    }
-  }
-
-  .dragging {
-    opacity: 0.5;
-    transform: rotate(2deg);
-  }
-
-  .drop-placeholder {
-    height: 0.125rem;
-    background: var(--vgmusic-accent);
-    margin: 0.25rem 0;
-    border-radius: 0.0625rem;
-    animation: pulse 1s infinite;
-  }
-
-  .not-sortable .playlist-section-item {
-    cursor: default;
-  }
-}
-
-/* Scene config button - outside of vgmusic-config since it's in a different context */
-.scene-config button[data-action='vgmusic-scene'] {
-  margin-left: var(--vgmusic-spacing);
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.6;
-  }
-
-  50% {
-    opacity: 1;
+  .sheet-footer {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
   }
 }

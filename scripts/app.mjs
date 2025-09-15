@@ -13,10 +13,10 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
     tag: 'form',
     window: { title: 'VGMusic.ConfigTitle', icon: 'fas fa-music', resizable: true, minimizable: true },
     modal: true,
-    classes: ['vgmusic-config'],
+    classes: ['vgmusic-config', 'dnd5e2'],
     form: {
       handler: VGMusicConfig.formHandler,
-      closeOnSubmit: true,
+      closeOnSubmit: false,
       submitOnChange: false
     },
     position: { width: 480, height: 'auto', top: 75 },
@@ -127,7 +127,8 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
     return {
       playlistConfig,
-      buttons
+      buttons,
+      documentType: this.document.documentName
     };
   }
 
@@ -428,21 +429,20 @@ export class VGMusicConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /** @override */
-  static formHandler(event, form, formData) {
-    const updateData = {};
-    VGMusicConfig.config.forEach((section) => {
-      const sectionData = {};
-      const priorityKey = `music.${section.id}.priority`;
-      if (formData.object[priorityKey] !== undefined) sectionData.priority = formData.object[priorityKey];
-      const trackKey = `music.${section.id}.initialTrack`;
-      if (formData.object[trackKey] !== undefined) sectionData.initialTrack = formData.object[trackKey];
-      if (Object.keys(sectionData).length > 0) {
-        Object.entries(sectionData).forEach(([key, value]) => {
-          updateData[`music.${section.id}.${key}`] = value;
-        });
+  static async formHandler(event, form, formData) {
+    const updateData = Object.fromEntries(Object.entries(formData.object).filter(([key]) => key.startsWith('music.')));
+    if (Object.keys(updateData).length > 0) {
+      try {
+        await this.updateObject(updateData);
+        this.close();
+      } catch (error) {
+        console.error('VGMusic | Error updating data:', error);
+        ui.notifications.error('Failed to save music configuration');
+        return false;
       }
-    });
-    if (Object.keys(updateData).length > 0) VGMusicConfig.updateObject(updateData);
+    } else {
+      this.close();
+    }
     return true;
   }
 }
@@ -501,16 +501,31 @@ export function getActorSheetHeaderControls(sheet, buttons) {
 
 export function handleSceneConfigRender(app, html) {
   try {
-    const playlistSelector = html.querySelector('select[name="playlistSound"]');
-    if (!playlistSelector) return;
+    const playlistSoundSelect = html.querySelector('select[name="playlistSound"]');
+    if (!playlistSoundSelect) return;
+    const existingFormGroup = playlistSoundSelect.closest('.form-group');
+    if (!existingFormGroup) return;
+    const newFormGroup = document.createElement('div');
+    newFormGroup.className = 'form-group';
+    const label = document.createElement('label');
+    label.textContent = game.i18n.localize('VGMusic.CombatMusic');
+    const formFields = document.createElement('div');
+    formFields.className = 'form-fields';
     const button = document.createElement('button');
     button.type = 'button';
     button.dataset.action = 'vgmusic-scene';
-    button.innerHTML = `<i class="fas fa-music"></i> ${game.i18n.localize('VGMusic.CombatMusic')}`;
-    playlistSelector.parentElement.insertAdjacentElement('afterend', button);
+    button.innerHTML = `<i class="fas fa-music"></i> ${game.i18n.localize('VGMusic.ConfigTitle')}`;
+    const hint = document.createElement('p');
+    hint.className = 'hint';
+    hint.textContent = game.i18n.localize('VGMusic.Settings.DefaultMusic.Hint');
+    formFields.appendChild(button);
+    newFormGroup.appendChild(label);
+    newFormGroup.appendChild(formFields);
+    newFormGroup.appendChild(hint);
+    existingFormGroup.insertAdjacentElement('afterend', newFormGroup);
     button.addEventListener('click', (event) => {
       event.preventDefault();
-      new VGMusicConfig(app.object).render(true);
+      new VGMusicConfig(app.document).render(true);
     });
   } catch (error) {
     console.error('VGMusic | Error adding scene config button:', error);
