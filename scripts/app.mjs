@@ -474,6 +474,20 @@ export function getActorSheetHeaderControls(sheet, buttons) {
   }
 }
 
+export function getActorSheetHeaderButtons(sheet, buttons) {
+  try {
+    if (!game.user.isGM) return;
+    buttons.unshift({
+      label: game.i18n.localize('VGMusic.CombatMusic'),
+      class: 'configure-combat-music',
+      icon: 'fas fa-music',
+      onclick: (ev) => new VGMusicConfig(sheet.document).render(true)
+    });
+  } catch (error) {
+    console.error('VGMusic | Error adding actor sheet header controls:', error);
+  }
+}
+
 export function getTidySheetHeaderControls(api) {
   api.registerActorHeaderControls?.({
     controls: [

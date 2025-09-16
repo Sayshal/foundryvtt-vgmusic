@@ -2,17 +2,18 @@ import { CONST } from './config.mjs';
 import { registerSettings, registerKeybindings } from './settings.mjs';
 import { MusicController } from './music-controller.mjs';
 import {
-  VGMusicConfig,
-  getSceneControlButtons,
+  getActorSheetHeaderButtons,
   getActorSheetHeaderControls,
+  getSceneControlButtons,
   getTidySheetHeaderControls,
-  handleSceneConfigRender,
-  handleUpdateCombat,
-  handleDeleteCombat,
   handleCanvasReady,
-  handleUpdateScene,
+  handleDeleteCombat,
+  handleReady,
+  handleSceneConfigRender,
   handleUpdateActor,
-  handleReady
+  handleUpdateCombat,
+  handleUpdateScene,
+  VGMusicConfig
 } from './app.mjs';
 
 Hooks.once('init', async () => {
@@ -26,6 +27,7 @@ Hooks.once('ready', handleReady);
 Hooks.once('tidy5e-sheet.ready', getTidySheetHeaderControls);
 Hooks.on('getSceneControlButtons', getSceneControlButtons);
 Hooks.on('getHeaderControlsBaseActorSheet', getActorSheetHeaderControls);
+Hooks.on('getActorSheetHeaderButtons', getActorSheetHeaderButtons); // Old AppV1 Hook
 Hooks.on('renderSceneConfig', handleSceneConfigRender);
 Hooks.on('updateCombat', handleUpdateCombat);
 Hooks.on('deleteCombat', handleDeleteCombat);
